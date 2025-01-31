@@ -61,25 +61,40 @@
 
 const http = require("http");
 const url = require("url")
+
+// turn it to top level code
+// use synchronouse because we only want to read it once 
+
+const tempOverview = fs.readFile(`${__dirname}/templates/template-overview.html`, 'utf-8');
+const tempCard = fs.readFile(`${__dirname}/templates/template-card.html`, 'utf-8');
+const tempProduct = fs.readFile(`${__dirname}/templates/template-product.html`, 'utf-8');
+const data= fs.readFileSync(`${__dirname}/dev-data/data.json`, 'utf-8');
+    const dataObj = JSON.parse(data);
+
 const Server = http.createServer((req, res) => {
     const pathName = req.url;
 
+    // for the overview
     if(pathName === '/' || pathName === '/overview'){
-        res.end("This is an Overview");
+        res.writeHead(200, {
+            "content-type": "text/html"
+        })
+        res.end(tempOverview);
     }
+    // for the product page
     else if(pathName === '/product'){
         res.end("This is a Product")
     }
+    // for the api
     else if(pathName === "/api"){
-        fs.readFile(`${__dirname}/dev-data/data.json`, 'utf-8', (err, data) => {
-            const productData = JSON.parse(data);
-            console.log("The product data is :", productData)
+       
             res.writeHead(200, {
                 "content-type": "application/json"
             })
-            res.end(data)
-        });
+            res.end(data);
+       
     }
+    // not found
     else{
         res.writeHead(404, {
             'content-type':"text/html",
